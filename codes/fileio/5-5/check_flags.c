@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
 	int newfd, flags1, flags2;
 
-	newd = dup(1);
+	newfd = dup(1);
 
 	flags1 = fcntl(1, F_GETFL);
 	flags2 = fcntl(newfd, F_GETFL);
@@ -15,5 +15,5 @@ int main(int argc, char *argv[])
 	else
 		printf("They don't share the same flags");
 
-	return 
+	return (EXIT_SUCCESS);
 }
