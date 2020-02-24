@@ -27,7 +27,7 @@ int m_dup2(int oldfd, int newfd)
 	if (oldfd == newfd)
 		return oldfd;
 
-	if (fcntl(1, F_GETFD) != -1)
+	if (fcntl(newfd, F_GETFD) != -1)
 		if (close(newfd) == -1)
 			errExit("close in m_dup2");
 
@@ -41,7 +41,7 @@ main(int argc, char **argv)
 	int newfd;
 	write(2, "Error1\n", 7);
 
-	newfd = m_dup2(120, 2);
+	newfd = m_dup2(1, 2);
 	if (newfd == -1)
 		errExit("m_dup");
 	write(2, "Error2\n", 7);
