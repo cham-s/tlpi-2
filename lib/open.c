@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include "tlpi_hdr.h"
+#include "error_functions.h"
 
 
 /*
@@ -48,16 +49,15 @@
 
 */
 
-#define LEN		strlen(valid_aguments)
 
-static char *valid_arguments = "rwdbactesxnsvl";
-static size_t len_arguments = LEN;
-
-static void is_valid_argument(const char args, size_t len)
+NORETURN is_valid_argument(const char *args, size_t len)
 {
+	const char *valid_arguments = "rwdbactesxnsvl";
+	size_t len_arguments = strlen(valid_arguments);
+
 	for (int i=0; i<len; i++)
-		for (int i=0; i<len_arguments; i++)
-			if (strchr(valid_arguments, ) == NULL)
+		if (strchr(valid_arguments, args[i]) == NULL)
+			errExit("invalid argument: %c", args[i]);
 }
 
 int	m_open(const char *filename, const char *flags, const char *perms)
@@ -71,8 +71,9 @@ int	m_open(const char *filename, const char *flags, const char *perms)
 
 	if (filename == NULL)
 		fatal("m_open NULL pointer sent as filename for open");
-	for (int i=0; i<len_flags; i++)
-		if (strchr(valid_arguments, ) == NULL)
+
+	if (s_valid_argument(flags) == 0)
+		fatal()
 
 	open_flags = 0;
 	file_perms = 0;
