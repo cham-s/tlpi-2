@@ -78,9 +78,26 @@ char **append_env(char **env, char *value)
 }
 
 
-/* int m_setenv(const char *name, const char *value, int overwrite);
+int m_setenv(const char *name, const char *value, int overwrite);
 {
-} */
+	char *complete_name;
+	size_t size_name;
+	size_t size_value;
+
+	if getenv(name == NULL)
+	{
+		size_name = strlen(name);
+		size_value = strlen(value);
+		complete_name = (char *)malloc(sizeof(char) * (size_name + size_value
+						+ 2));
+		strncpy(complete_name, name, size_name);
+		complete_name[size_name] = '=';
+		strncpy(complete_name + (size_name + 1), value, size_value);
+		complete_name[size_name + size_value + 1] = '\0';
+
+		putenv()
+	}
+}
 
 int main(int argc, char *argv[], char **env)
 {
