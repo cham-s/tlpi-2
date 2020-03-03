@@ -65,7 +65,7 @@ char **append_env(char **env, char *value)
 		strcpy(entry, env[i]);
 
 		if (entry == NULL)
-			fatal("malloc failed at append_env() while setting entry");
+			errExit("malloc failed at append_env() while setting up entry");
 
 		new_array[i] = entry;
 		i += 1;
@@ -83,20 +83,24 @@ int m_setenv(const char *name, const char *value, int overwrite);
 	char *complete_name;
 	size_t size_name;
 	size_t size_value;
+	char *getenv_pointer;
+
+	if getenv(name != NULL && overwrite != 0)
+		return 0;
+
+	size_name = strlen(name);
+	size_value = strlen(value);
+	complete_name = (char *)malloc(sizeof(char) * (size_name + size_value
+					+ 2));
+	strncpy(complete_name, name, size_name);
+	complete_name[size_name] = '=';
+	strncpy(complete_name + (size_name + 1), value, size_value);
+	complete_name[size_name + size_value + 1] = '\0';
 
 	if getenv(name == NULL)
-	{
-		size_name = strlen(name);
-		size_value = strlen(value);
-		complete_name = (char *)malloc(sizeof(char) * (size_name + size_value
-						+ 2));
-		strncpy(complete_name, name, size_name);
-		complete_name[size_name] = '=';
-		strncpy(complete_name + (size_name + 1), value, size_value);
-		complete_name[size_name + size_value + 1] = '\0';
-
-		putenv()
-	}
+		if (putenv(complete_name) != 0)
+			errExit("error putenv() %s", complete_name);
+	else if (overwrite != 0)
 }
 
 int main(int argc, char *argv[], char **env)
