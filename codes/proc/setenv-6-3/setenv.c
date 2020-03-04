@@ -1,6 +1,8 @@
 #include "tlpi_hdr.h"
 #include <string.h>
 
+extern char **environ;
+
 static size_t size_array(char **array)
 {
 	size_t i;
@@ -77,15 +79,36 @@ char **append_env(char **env, char *value)
 	return new_array;
 }
 
+void update_name(const char *name, char *complete_name)
+{
+	size_t i;
+	size_t len;
 
-int m_setenv(const char *name, const char *value, int overwrite);
+	i = 0;
+	len = strlen(name);
+
+	while (environ[i] != NULL)
+	{
+		if (strncmp(environ[i], name, len) == 0)
+		{
+			environ[i] = complete_name;
+			break;
+		}
+		i += 1;
+	}
+}
+
+
+int m_setenv(const char *name, const char *value, int overwrite)
 {
 	char *complete_name;
 	size_t size_name;
 	size_t size_value;
 	char *getenv_pointer;
 
-	if getenv(name != NULL && overwrite != 0)
+	getenv_pointer = getenv(name);
+
+	if (getenv_pointer != NULL && overwrite == 0)
 		return 0;
 
 	size_name = strlen(name);
@@ -97,21 +120,44 @@ int m_setenv(const char *name, const char *value, int overwrite);
 	strncpy(complete_name + (size_name + 1), value, size_value);
 	complete_name[size_name + size_value + 1] = '\0';
 
-	if getenv(name == NULL)
+	if (getenv_pointer == NULL)
+	{
+		printf("\n\nCase Not Present\n\n");
 		if (putenv(complete_name) != 0)
 			errExit("error putenv() %s", complete_name);
+		return 0;
+	}
 	else if (overwrite != 0)
+	{
+		printf("\nCase Update\n");
+		update_name(name, complete_name);
+	}
+
+	return 0;
 }
 
-int main(int argc, char *argv[], char **env)
+int main(int argc, char *argv[])
 {
-	char **new_env;
+	printf("Fresh env:\n\n");
+	print_array(environ);
 
-	printf("[DEBUG] env before:\n");
-	print_array(env);
-	new_env = append_env(env, "NEW=Value");
-	printf("[DEBUG] env after:\n");
-	print_array(new_env);
+	printf("\n");
 
-	exit(EXIT_SUCCESS);
+	printf("Adding GREET=Bonjour:\n\n");
+	m_setenv("GREET", "Bonjour", 0);
+	print_array(environ);
+
+	printf("\n");
+
+	printf("Set env with overwrite 0 GREET=Hola:\n\n");
+	m_setenv("GREET", "Hola", 0);
+	print_array(environ);
+
+	printf("\n");
+
+	printf("Set env with overwrite 1 GREET=Hola:\n\n");
+	m_setenv("GREET", "Hola", 1);
+	print_array(environ);
+
+	return 0;
 }
