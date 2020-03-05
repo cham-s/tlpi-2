@@ -79,6 +79,25 @@ char **append_env(char **env, char *value)
 	return new_array;
 }
 
+size_t index_of(char *name, char **array)
+{
+	size_t i;
+	size_t len;
+
+	len = strlen(name);
+
+	i = 0;
+
+	while (array[i] != NULL)
+	{
+		if (strncmp(array[i], name, len) == 0)
+			return i;
+		i += 1;
+	}
+
+	return -1;
+}
+
 void update_name(const char *name, char *complete_name)
 {
 	size_t i;
@@ -96,6 +115,47 @@ void update_name(const char *name, char *complete_name)
 		}
 		i += 1;
 	}
+}
+
+// get a duplicate environ without the one mentioned in name
+char **delete_name(char *name)
+{
+	size_t env_len;
+	size_t index;
+	size_t i;
+	size_t str_len;
+	char **new_env;
+	char *duplicate;
+
+	i = 0;
+	len = size_array(environ);
+	index = index_of(name, environ);
+
+	new_env = (char **)malloc(sizeof(char *) * env_len);
+
+	if (new_env == NULL)
+		errExit("error malloc in delete_name()");
+
+	while (environ[i] != NULL)
+	{
+		if (i == index)
+		{
+			i += 1;
+			continue;
+		}
+		str_len = strlen(environ[i]);
+		duplicate = (char *)malloc(sizeof(char) * str_len);
+
+		if (duplicate == NULL)
+			errExit("error malloc in delete_name()");
+		strcpy(duplicate, environ[i]);
+		new_env[i] = duplicate;
+
+		i += 1;
+	}
+	new_env[i] = NULL;
+
+	return new_env;
 }
 
 
@@ -136,8 +196,19 @@ int m_setenv(const char *name, const char *value, int overwrite)
 	return 0;
 }
 
+int m_unsetenv(const char *name)
+{
+	size_t len;
+
+	if (getenv(name) == NULL)
+		return 0;
+
+	len = size_array(environ);
+}
+
 int main(int argc, char *argv[])
 {
+	// setenv tests
 	printf("Fresh env:\n\n");
 	print_array(environ);
 
@@ -158,6 +229,8 @@ int main(int argc, char *argv[])
 	printf("Set env with overwrite 1 GREET=Hola:\n\n");
 	m_setenv("GREET", "Hola", 1);
 	print_array(environ);
+
+	// unsetenv test
 
 	return 0;
 }
