@@ -79,7 +79,7 @@ char **append_env(char **env, char *value)
 	return new_array;
 }
 
-size_t index_of(char *name, char **array)
+size_t index_of(const char *name, char **array)
 {
 	size_t i;
 	size_t len;
@@ -118,23 +118,25 @@ void update_name(const char *name, char *complete_name)
 }
 
 // get a duplicate environ without the one mentioned in name
-char **delete_name(char *name)
+char **delete_name(const char *name)
 {
 	size_t env_len;
 	size_t index;
 	size_t i;
+	size_t env_i;
 	size_t str_len;
 	char **new_env;
 	char *duplicate;
 
 	i = 0;
-	len = size_array(environ);
+	env_i = 0;
+	env_len = size_array(environ);
 	index = index_of(name, environ);
 
 	new_env = (char **)malloc(sizeof(char *) * env_len);
 
 	if (new_env == NULL)
-		errExit("error malloc in delete_name()");
+		return NULL;
 
 	while (environ[i] != NULL)
 	{
@@ -147,13 +149,14 @@ char **delete_name(char *name)
 		duplicate = (char *)malloc(sizeof(char) * str_len);
 
 		if (duplicate == NULL)
-			errExit("error malloc in delete_name()");
-		strcpy(duplicate, environ[i]);
-		new_env[i] = duplicate;
+			return NULL;
 
+		new_env[env_i] = strcpy(duplicate, environ[i]);
+
+		env_i += 1;
 		i += 1;
 	}
-	new_env[i] = NULL;
+	new_env[env_i] = NULL;
 
 	return new_env;
 }
@@ -199,38 +202,61 @@ int m_setenv(const char *name, const char *value, int overwrite)
 int m_unsetenv(const char *name)
 {
 	size_t len;
+	char **tmp;
 
 	if (getenv(name) == NULL)
 		return 0;
 
-	len = size_array(environ);
+	tmp = delete_name(name);
+
+	if (tmp == NULL)
+		return -1;
+
+	environ = tmp;
+	return 0;
 }
 
 int main(int argc, char *argv[])
 {
+	size_t count;
+
+
 	// setenv tests
 	printf("Fresh env:\n\n");
 	print_array(environ);
+	count = size_array(environ);
+	printf("\nsize: %zu\n", count);
 
-	printf("\n");
-
-	printf("Adding GREET=Bonjour:\n\n");
+	printf("\nAdding GREET=Bonjour:\n\n");
 	m_setenv("GREET", "Bonjour", 0);
 	print_array(environ);
+	count = size_array(environ);
+	printf("\nsize: %zu\n", count);
 
-	printf("\n");
-
-	printf("Set env with overwrite 0 GREET=Hola:\n\n");
+	printf("\nSet env with overwrite 0 GREET=Hola:\n\n");
 	m_setenv("GREET", "Hola", 0);
 	print_array(environ);
+	count = size_array(environ);
+	printf("\nsize: %zu\n", count);
 
-	printf("\n");
-
-	printf("Set env with overwrite 1 GREET=Hola:\n\n");
+	printf("\nSet env with overwrite 1 GREET=Hola:\n\n");
 	m_setenv("GREET", "Hola", 1);
 	print_array(environ);
+	count = size_array(environ);
+	printf("\nsize: %zu\n", count);
 
 	// unsetenv test
+	printf("\nUnset env removing invalid name HELLO:\n\n");
+	m_unsetenv("HELLO");
+	print_array(environ);
+	count = size_array(environ);
+	printf("\nsize: %zu\n", count);
+
+	printf("\nUnset env removing valid name GREET:\n\n");
+	m_unsetenv("GREET");
+	print_array(environ);
+	count = size_array(environ);
+	printf("\nsize: %zu\n", count);
 
 	return 0;
 }
