@@ -1,4 +1,4 @@
-objects		= error_functions.o  get_num.o
+objects		= error_functions.o get_num.o ugid_functions.o
 cc     		= clang
 includes	= ../includes
 name		= libtlpi.a
