@@ -1,4 +1,4 @@
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 #define _XOPEN_SOURCE
 #include <unistd.h>
 #include <limits.h>
@@ -37,7 +37,7 @@ main(int argc, char *argv[])
 	if (pwd == NULL)
 		fatal("couldn't password record");
 	spwd = getspnam(username);
-	if (spwd == NULL && errno == EACESS)
+	if (spwd == NULL && errno == EACCES)
 		fatal("no permission to read shadow password file");
 
 	if (spwd != NULL)
@@ -58,7 +58,7 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	printf("Successfully authenticated: UID=%ld\n", (long) pwd->pwd_uid);
+	printf("Successfully authenticated: UID=%ld\n", (long) pwd->pw_uid);
 
 	// now do authenticated work
 

@@ -5,7 +5,7 @@ name		= check_password
 cc			= clang -g
 
 $(name): $(objects)
-	$(cc) -I$(includes) $(objects) -L$(lib) -ltlpi -o $(name)
+	$(cc) -I$(includes) $(objects) -L$(lib) -ltlpi -lcrypt -o $(name)
 
 %.o: %.c
 	$(cc) -c -o $@ -I$(includes) $(lib) $<
